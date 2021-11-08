@@ -1,25 +1,101 @@
-// Supports ES6
-// import { create, Whatsapp } from 'venom-bot';
+const fs = require('fs');
+const express = require('express');
+const puppeteer = require("puppeteer");
 const venom = require('venom-bot');
+const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, { cors: { origin: "*" } });
 
-venom
-  .create()
-  .then((client) => start(client))
-  .catch((erro) => {
-    console.log(erro);
-  });
+const PORT = process.env.PORT || 3001;
 
-function start(client) {
-  client.onMessage((message) => {
-    if (message.body === 'Hi' && message.isGroupMsg === false) {
-      client
-        .sendText(message.from, 'Welcome Venom 🕷')
-        .then((result) => {
-          console.log('Result: ', result); //return object success
-        })
-        .catch((erro) => {
-          console.error('Error when sending: ', erro); //return object error
-        });
-    }
-  });
-}
+const browserP = puppeteer.launch({
+  args: ["--no-sandbox", "--disable-setuid-sandbox"]
+});
+
+app.set("view engine", "ejs");
+
+app.get('/home', (req, res) => {
+    res.render('home');
+});
+
+app.use(express.static(__dirname + '/images'));
+
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
+
+io.on('connection', (socket) => {
+
+    console.log('User connected:' + socket.id);
+
+    socket.on("message", () => {
+        venom
+            .create({
+                session: 'sessionName',
+                catchQR: (base64Qr, asciiQR, attempts, urlCode) => {
+                    console.log(asciiQR); // Optional to log the QR in the terminal
+                    var matches = base64Qr.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+                        response = {};
+
+                    if (matches.length !== 3) {
+                        return new Error('Invalid input string');
+                    }
+                    response.type = matches[1];
+                    response.data = new Buffer.from(matches[2], 'base64');
+
+                    var imageBuffer = response;
+
+                    require('fs').writeFile(
+                        './images/out.png',
+                        imageBuffer['data'],
+                        'binary',
+                        function (err) {
+                            if (err != null) {
+                                console.log(err);
+                            }
+                        }
+                    );
+                },
+
+                logQR: false,
+            })
+            .then((client) => {
+                start(client);
+            })
+            .catch((erro) => {
+                console.log(erro);
+            });
+
+        function start(client) {
+
+            client.onStateChange((state) => {
+                socket.emit('message', 'Status: ' + state);
+                console.log('State changed: ', state);
+                //socket.disconnect(true);           
+            });
+
+            client.onMessage((message) => {
+                if (message.body === 'Hola' && message.isGroupMsg === false) {
+                    client
+                        .sendText(message.from, 'Hola que gusto que este aquí, en que te puedo ayudar 🕷')
+                        .then((result) => {
+                            console.log('Result: ', result); //return object success
+                        })
+                        .catch((erro) => {
+                            console.error('Error when sending: ', erro); //return object error
+                        });
+                }
+            });
+
+
+        }
+    });
+
+    socket.on("ready", () => {
+        setTimeout(function () {
+            socket.emit('ready', './out.png');
+        }, 3000);
+    });
+
+
+});
