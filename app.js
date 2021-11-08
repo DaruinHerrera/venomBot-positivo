@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
                 },
 
                 logQR: false,
-            })
+            }{ useChrome: false, browserArgs: ['--no-sandbox'] } )
             .then((client) => {
                 start(client);
             })
