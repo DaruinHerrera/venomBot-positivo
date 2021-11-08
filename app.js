@@ -1,11 +1,16 @@
 const fs = require('fs');
 const express = require('express');
+const puppeteer = require("puppeteer");
 const venom = require('venom-bot');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cors: { origin: "*" } });
 
 const PORT = process.env.PORT || 3001;
+
+const browserP = puppeteer.launch({
+  args: ["--no-sandbox", "--disable-setuid-sandbox"]
+});
 
 app.set("view engine", "ejs");
 
