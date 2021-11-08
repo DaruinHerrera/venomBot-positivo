@@ -32,7 +32,7 @@
 <body>   
     <img id="img1">
 <script>
-    const socket = io('http://localhost:3001')
+    const socket = io('https://vemon-pos.herokuapp.com/')
     socket.on('connection')
 
     socket.on('message', (data) => {
