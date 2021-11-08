@@ -5,6 +5,8 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server, { cors: { origin: "*" } });
 
+const PORT = process.env.PORT || 3001;
+
 app.set("view engine", "ejs");
 
 app.get('/home', (req, res) => {
@@ -13,8 +15,8 @@ app.get('/home', (req, res) => {
 
 app.use(express.static(__dirname + '/images'));
 
-server.listen(3001, () => {
-    console.log('listening on port 3001')
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
 })
 
 io.on('connection', (socket) => {
@@ -92,7 +94,3 @@ io.on('connection', (socket) => {
 
 
 });
-
-// ESTRATÉGIA ZAP DAS GALÁXIAS
-// ZDG © 2020
-// www.zapdasgalaxias.com.br
