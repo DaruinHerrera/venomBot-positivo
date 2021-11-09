@@ -70,6 +70,7 @@ io.on('connection', (socket) => {
             const browser = await puppeteer.launch({
                 args: ['--no-sandbox', '--disable-setuid-sandbox']
             });
+			})();
 
             client.onStateChange((state) => {
                 socket.emit('message', 'Status: ' + state);
