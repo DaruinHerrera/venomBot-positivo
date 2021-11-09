@@ -8,9 +8,10 @@ const io = require('socket.io')(server, { cors: { origin: "*" } });
 
 const PORT = process.env.PORT || 3001;
 
-const browserP = puppeteer.launch({
-  args: ["--no-sandbox", "--disable-setuid-sandbox"]
-});
+const browser = await puppeteer.launch({
+                  headless: true,
+                  args: ['--no-sandbox','--disable-setuid-sandbox']
+                })
 
 app.set("view engine", "ejs");
 
