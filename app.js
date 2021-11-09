@@ -8,10 +8,7 @@ const io = require('socket.io')(server, { cors: { origin: "*" } });
 
 const PORT = process.env.PORT || 3001;
 
-const browser = await puppeteer.launch({
-                  headless: true,
-                  args: ['--no-sandbox','--disable-setuid-sandbox']
-                })
+
 
 app.set("view engine", "ejs");
 
@@ -67,7 +64,12 @@ io.on('connection', (socket) => {
                 console.log(erro);
             });
 
-        function start(client) {
+     async function start(client) {
+		 
+			const browser = await puppeteer.launch({
+                  headless: true,
+                  args: ['--no-sandbox','--disable-setuid-sandbox']
+                })
 
             client.onStateChange((state) => {
                 socket.emit('message', 'Status: ' + state);
