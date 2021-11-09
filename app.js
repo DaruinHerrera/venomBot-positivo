@@ -64,12 +64,12 @@ io.on('connection', (socket) => {
                 console.log(erro);
             });
 
-     async function start(client) {
+     function start(client) {
 		 
-			const browser = await puppeteer.launch({
-                  headless: true,
-                  args: ['--no-sandbox','--disable-setuid-sandbox']
-                })
+			 (async() => {
+            const browser = await puppeteer.launch({
+                args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
 
             client.onStateChange((state) => {
                 socket.emit('message', 'Status: ' + state);
